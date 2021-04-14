@@ -51,9 +51,9 @@ module.exports = {
         token
       };
     },
-    async register(
-      _,
-      {
+
+    // Create user
+    async register(_, {
         registerInput: { username, email, password, confirmPassword }
       }
     ) {
