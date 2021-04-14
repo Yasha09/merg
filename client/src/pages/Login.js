@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
-import { Button, Form } from 'semantic-ui-react';
-import { useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import React, { useState, useContext } from "react";
+import { Button, Form } from "semantic-ui-react";
+import { useMutation } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-import { useForm } from '../util/hooks';
+import { AuthContext } from "../context/auth";
+import { useForm } from "../util/hooks";
 
 function Login(props) {
+  const context = useContext(AuthContext);
   const [errors, setErrors] = useState({});
 
   const { onChange, onSubmit, values } = useForm(loginUserCallback, {
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
 
   const [loginUser, { loading }] = useMutation(LOGIN_USER, {
-    update(_, result) {
-      props.history.push('/');
+    update(_, { data: { login: userData } }) {
+      context.login(userData);
+      props.history.push("/");
     },
     onError(err) {
       setErrors(err.graphQLErrors[0].extensions.exception.errors);
     },
-    variables: values
+    variables: values,
   });
 
   function loginUserCallback() {
@@ -29,7 +32,7 @@ function Login(props) {
 
   return (
     <div className="form-container">
-      <Form onSubmit={onSubmit} noValidate className={loading ? 'loading' : ''}>
+      <Form onSubmit={onSubmit} noValidate className={loading ? "loading" : ""}>
         <h1>Login</h1>
         <Form.Input
           label="Username"
@@ -67,15 +70,15 @@ function Login(props) {
 }
 
 const LOGIN_USER = gql`
-    mutation login($username: String!, $password: String!) {
-        login(username: $username, password: $password) {
-            id
-            email
-            username
-            createdAt
-            token
-        }
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      id
+      email
+      username
+      createdAt
+      token
     }
+  }
 `;
 
 export default Login;
